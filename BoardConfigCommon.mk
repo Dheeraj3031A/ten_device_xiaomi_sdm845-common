@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2018-2020 The LineageOS Project
+# Copyright (C) 2018-2023 The LineageOS Project
 #
 # SPDX-License-Identifier: Apache-2.0
 #
@@ -40,15 +40,8 @@ BOARD_RAMDISK_OFFSET := 0x01000000
 TARGET_KERNEL_ARCH := arm64
 ifeq ($(TARGET_PREBUILT_KERNEL),)
   TARGET_KERNEL_CLANG_COMPILE := true
+  TARGET_KERNEL_CLANG_VERSION := 12
   TARGET_KERNEL_SOURCE := kernel/xiaomi/beryllium
-  TARGET_KERNEL_ADDITIONAL_FLAGS := \
-        LD=ld.lld \
-        AR=llvm-ar \
-        NM=llvm-nm \
-        OBJCOPY=llvm-objcopy \
-        OBJDUMP=llvm-objdump \
-        STRIP=llvm-strip \
-        ld-name=lld
 endif
 
 # Use Snapdragon LLVM, if available
@@ -142,7 +135,7 @@ ENABLE_VENDOR_RIL_SERVICE := true
 TARGET_PROVIDES_QTI_TELEPHONY_JAR := true
 
 # Security patch level
-VENDOR_SECURITY_PATCH := 2024-09-11
+VENDOR_SECURITY_PATCH := 2024-09-05
 
 # Sepolicy
 include device/qcom/sepolicy/sepolicy.mk
