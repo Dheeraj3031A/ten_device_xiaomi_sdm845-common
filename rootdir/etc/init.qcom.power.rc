@@ -26,6 +26,7 @@
 #
 
 on early-init
+    write /proc/sys/kernel/sched_boost 1
 
 on init
     write /dev/stune/foreground/schedtune.sched_boost_no_override 1
@@ -47,7 +48,8 @@ on init
     write /sys/module/qpnp_rtc/parameters/poweron_alarm 1
 
     # set default schedTune value for foreground/top-app
-    write /dev/stune/top-app/schedtune.boost 5
+    write /dev/stune/foreground/schedtune.prefer_idle 1
+    write /dev/stune/top-app/schedtune.boost 10
     write /dev/stune/top-app/schedtune.prefer_idle 1
 
     # Add a cpuset for the camera daemon
@@ -84,6 +86,12 @@ on property:init.svc.vendor.charger=running
     load_system_props
 
     # Keep one LITTLE and one big
+    write /sys/devices/system/cpu/cpu1/online 0
+    write /sys/devices/system/cpu/cpu2/online 0
+    write /sys/devices/system/cpu/cpu3/online 0
+    write /sys/devices/system/cpu/cpu5/online 0
+    write /sys/devices/system/cpu/cpu6/online 0
+    write /sys/devices/system/cpu/cpu7/online 0
     wait /dev/block/bootdevice
 
     # Enable UFS powersaving
@@ -137,16 +145,14 @@ on enable-low-power
 
     # Configure governor settings for little cluster
     write /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor "schedutil"
-    write /sys/devices/system/cpu/cpu0/cpufreq/schedutil/up_rate_limit_us 500
-    write /sys/devices/system/cpu/cpu0/cpufreq/schedutil/down_rate_limit_us 20000
+    write /sys/devices/system/cpu/cpu0/cpufreq/schedutil/rate_limit_us 0
     write /sys/devices/system/cpu/cpu0/cpufreq/schedutil/hispeed_freq 1209600
     write /sys/devices/system/cpu/cpu0/cpufreq/schedutil/pl 1
     write /sys/devices/system/cpu/cpu0/cpufreq/scaling_min_freq 576000
 
     # Configure governor settings for big cluster
     write /sys/devices/system/cpu/cpu4/cpufreq/scaling_governor "schedutil"
-    write /sys/devices/system/cpu/cpu6/cpufreq/schedutil/up_rate_limit_us 500
-    write /sys/devices/system/cpu/cpu6/cpufreq/schedutil/down_rate_limit_us 20000
+    write /sys/devices/system/cpu/cpu4/cpufreq/schedutil/rate_limit_us 0
     write /sys/devices/system/cpu/cpu4/cpufreq/schedutil/hispeed_freq 1574400
     write /sys/devices/system/cpu/cpu4/cpufreq/schedutil/pl 1
     write /sys/module/cpu_boost/parameters/input_boost_freq "0:1324800"
@@ -210,11 +216,13 @@ on enable-low-power
 
     # Set cpuset parameters
     write /dev/cpuset/top-app/cpus "0-7"
-    write /dev/cpuset/foreground/cpus "0-2,4-7"
-    write /dev/cpuset/audio-app/cpus "2-5"
+    write /dev/cpuset/foreground/cpus "0-3,6-7"
     write /dev/cpuset/background/cpus "0-1"
     write /dev/cpuset/system-background/cpus "0-3"
     write /dev/cpuset/restricted/cpus "0-3"
+
+    # Turn off scheduler boost at the end
+    write /proc/sys/kernel/sched_boost 0
 
     # Disable CPU Retention
     write /sys/module/lpm_levels/L3/cpu0/ret/idle_enabled "N"
@@ -245,17 +253,12 @@ on enable-low-power
 on property:sys.boot_completed=1
     trigger enable-low-power
 
-    # Enable idle state listener
-    write /sys/class/drm/card0/device/idle_encoder_mask 1
-    write /sys/class/drm/card0/device/idle_timeout_ms 100
-
 on property:init.svc.recovery=running
     trigger enable-low-power
 
-service vendor.charger /system/bin/chargeonlymode
+service charger /system/bin/charger
     class charger
-    user system
-    group system graphics input
+    group system graphics
     capabilities SYS_BOOT
     seclabel u:r:charger:s0
 

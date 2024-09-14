@@ -44,7 +44,7 @@ vendor.audio.feature.hifi_audio.enable=false
 vendor.audio.feature.hwdep_cal.enable=false
 vendor.audio.feature.incall_music.enable=false
 vendor.audio.feature.keep_alive.enable=false
-vendor.audio.feature.kpi_optimize.enable=false
+vendor.audio.feature.kpi_optimize.enable=true
 vendor.audio.feature.maxx_audio.enable=false
 vendor.audio.feature.multi_voice_session.enable=true
 vendor.audio.feature.ras.enable=true
@@ -84,10 +84,14 @@ vendor.audio.volume.headset.gain.depcal=true
 # Bluetooth
 persist.bt.enableAptXHD=true
 persist.service.btui.use_aptx=1
+persist.bluetooth.a2dp_offload.disabled=false
+persist.bluetooth.a2dp_offload.cap=sbc-aac-aptx-aptxhd-ldac
+persist.vendor.bt.a2dp_offload_cap=sbc-aptx-aptxtws-aptxhd-aac-ldac
+persist.vendor.bt.aac_frm_ctl.enabled=true
+persist.vendor.bt.enable.splita2dp=true
 persist.vendor.qcom.bluetooth.enable.splita2dp=true
 persist.vendor.qcom.bluetooth.a2dp_offload_cap=sbc-aptx-aptxtws-aptxhd-aac-ldac
-persist.vendor.qcom.bluetooth.aac_frm_ctl.enabled=true
-persist.vendor.qcom.bluetooth.twsp_state.enabled=false
+ro.bluetooth.a2dp_offload.supported=true
 vendor.qcom.bluetooth.soc=cherokee
 
 # Display post-processing
@@ -130,3 +134,6 @@ ro.vendor.audio.soundtrigger.cnn.adsp.level=27
 ro.vendor.audio.soundtrigger.vop.adsp.level=10
 ro.vendor.audio.soundtrigger.training.level=60
 ro.vendor.audio.soundtrigger.hist.duration=1500
+
+# Perf
+ro.vendor.extension_library=libqti-perfd-client.so
